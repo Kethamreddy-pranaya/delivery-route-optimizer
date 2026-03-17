@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Delivery Routes</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<style>
+
+#map{
+height:650px;
+width:90%;
+margin:auto;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2 style="text-align:center;">Delivery Routes</h2>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+
+let coords = {{ coords|tojson }};
+let distances = {{ distances|tojson }};
+
+let map = L.map('map').setView(coords[0],5);
+
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+).addTo(map);
+
+
+// markers
+coords.forEach(c=>{
+    L.marker(c).addTo(map);
+});
+
+
+// draw routes + distance labels
+for(let i=0;i<coords.length-1;i++){
+
+    let start = coords[i];
+    let end = coords[i+1];
+
+    let line = L.polyline([start,end],{
+        color:"blue",
+        weight:4
+    }).addTo(map);
+
+    let midLat = (start[0] + end[0]) / 2;
+    let midLng = (start[1] + end[1]) / 2;
+
+    L.marker([midLat,midLng],{
+        icon: L.divIcon({
+            className:"distance-label",
+            html:"<b>"+distances[i]+" km</b>"
+        })
+    }).addTo(map);
+
+}
+
+</script>
+
+</body>
+</html>
